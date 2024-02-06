@@ -10,7 +10,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "SH\\AutoHook\\": "tests/"
+            "SH\\AutoHook\\Tests\\": "tests/"
         }
     },
     "authors": [
