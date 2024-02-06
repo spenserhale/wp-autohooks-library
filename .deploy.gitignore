@@ -1,0 +1,10 @@
+/.github/
+/.idea/
+/build/
+/tests/
+.gitignore
+phpunit.xml
+phpunit.xml.dist
+DOCKER_ENV
+docker_tag
+output.log
