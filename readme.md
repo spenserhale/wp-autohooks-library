@@ -57,7 +57,10 @@ To run tests, make sure to create class list through composer:
 Then run the tests:
    ```sh
     composer test
-   ```        
+   ```
+
+## License
+The WordPress AutoHooks Library is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
