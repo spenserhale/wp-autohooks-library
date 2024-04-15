@@ -27,7 +27,7 @@
         "vendor-dir": "vendor"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.5"
+        "phpunit/phpunit": "^10"
     },
     "scripts": {
         "test": "phpunit"

@@ -47,6 +47,26 @@ $classes = \SH\AutoHook\ComposerJsonParser::getClasses($composerJsonPath);
 (bool) $written = \SH\AutoHook\FileWriter::write($output, $outputPath);
    ```
 
+### Advanced Usage
+
+Some projects may not have the composer.json available at runtime, so you can use the class loader object.
+
+#### Build/Wire Up
+
+  ```php
+// Get Classloader object
+$loader = require 'vendor/autoload.php';
+
+// Get the list of classes
+$classes = \SH\AutoHook\ComposerClassLoaderParser::getClasses($loader, ['App\\', 'MyNamespace\\']);
+
+// Process classes to string
+[$output] = \SH\AutoHook\AttributeResolver::processClassesToString($classes);
+
+// Write to file
+(bool) $written = \SH\AutoHook\FileWriter::write($output, $outputPath);
+   ```
+
 ## Tests
 
 To run tests, make sure to create class list through composer:
