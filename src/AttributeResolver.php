@@ -44,6 +44,10 @@ class AttributeResolver
         foreach ($classes as $class) {
             try {
                 $reflector = new ReflectionClass($class);
+                if ($reflector->isAbstract() || $reflector->isInterface() || $reflector->isTrait()) {
+                    continue;
+                }
+
                 self::processClassAttributes($hooks, $reflector);
 
                 foreach ($reflector->getMethods() as $method) {
