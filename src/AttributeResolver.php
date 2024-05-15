@@ -41,17 +41,17 @@ class AttributeResolver
         $hooks  = [];
         $errors = [];
 
-        foreach ($classes as $class) {
+        foreach ($classes as $classNamme) {
             try {
-                $reflector = new ReflectionClass($class);
-                if ($reflector->isAbstract() || $reflector->isInterface() || $reflector->isTrait()) {
+                $reflectorClass = new ReflectionClass($classNamme);
+                if ($reflectorClass->isAbstract() || $reflectorClass->isInterface() || $reflectorClass->isTrait()) {
                     continue;
                 }
 
-                self::processClassAttributes($hooks, $reflector);
+                self::processClassAttributes($hooks, $reflectorClass);
 
-                foreach ($reflector->getMethods() as $method) {
-                    self::processMethodAttributes($hooks, $method);
+                foreach ($reflectorClass->getMethods() as $method) {
+                    self::processMethodAttributes($hooks, $reflectorClass, $method);
                 }
             } catch (Throwable $e) {
                 $errors[] = $e;
@@ -61,25 +61,25 @@ class AttributeResolver
         return [$hooks, $errors];
     }
 
-    private static function processClassAttributes(array &$hooks, ReflectionClass $reflector): void
+    private static function processClassAttributes(array &$hooks, ReflectionClass $class): void
     {
-        foreach (self::getAttributeInstances($reflector, Hook::class) as $hook) {
-            $hooks[] = $hook->setByClass($reflector);
+        foreach (self::getAttributeInstances($class, Hook::class) as $hook) {
+            $hooks[] = $hook->setByClass($class);
         }
 
-        foreach (self::getAttributeInstances($reflector, Shortcode::class) as $shortcode) {
-            $hooks[] = $shortcode->setByClass($reflector);
+        foreach (self::getAttributeInstances($class, Shortcode::class) as $shortcode) {
+            $hooks[] = $shortcode->setByClass($class);
         }
     }
 
-    private static function processMethodAttributes(array &$hooks, ReflectionMethod $reflector): void
+    private static function processMethodAttributes(array &$hooks, ReflectionClass $class, ReflectionMethod $method): void
     {
-        foreach (self::getAttributeInstances($reflector, Hook::class) as $hook) {
-            $hooks[] = $hook->setByMethod($reflector);
+        foreach (self::getAttributeInstances($method, Hook::class) as $hook) {
+            $hooks[] = $hook->setByMethod($class, $method);
         }
 
-        foreach (self::getAttributeInstances($reflector, Shortcode::class) as $shortcode) {
-            $hooks[] = $shortcode->setByMethod($reflector);
+        foreach (self::getAttributeInstances($method, Shortcode::class) as $shortcode) {
+            $hooks[] = $shortcode->setByMethod($class, $method);
         }
     }
 

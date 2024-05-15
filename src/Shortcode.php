@@ -17,9 +17,9 @@ class Shortcode
         public ?string $callback = null,
     ) {}
 
-    public function setByMethod(\ReflectionMethod $method): static
+    public function setByMethod(\ReflectionClass $class, \ReflectionMethod $method): static
     {
-        $this->callback = "{$method->getDeclaringClass()->getName()}::{$method->getName()}";
+        $this->callback = "{$class->getName()}::{$method->getName()}";
 
         return $this;
     }

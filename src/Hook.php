@@ -20,9 +20,9 @@ class Hook
         public string $type = 'add_filter'
     ) {}
 
-    public function setByMethod(\ReflectionMethod $method): static
+    public function setByMethod(\ReflectionClass $class, \ReflectionMethod $method): static
     {
-        $this->callback = "{$method->getDeclaringClass()->getName()}::{$method->getName()}";
+        $this->callback = "{$class->getName()}::{$method->getName()}";
         $this->arguments = $method->getNumberOfParameters();
         if($method->getReturnType()?->getName() === 'void') {
             $this->type = 'add_action';
