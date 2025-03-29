@@ -57,6 +57,13 @@ class Hook
 
     public function __toString(): string
     {
-        return "$this->type('$this->tag', '$this->callback', $this->priority, $this->arguments);\n";
+        $params = ["'$this->tag'", "'$this->callback'"];
+        if ($this->priority !== 10 || $this->arguments !== 1) {
+            $params[] = $this->priority;
+            if ($this->arguments !== 1) {
+                $params[] = $this->arguments;
+            }
+        }
+        return "$this->type(" . implode(', ', $params) . ");\n";
     }
 }
