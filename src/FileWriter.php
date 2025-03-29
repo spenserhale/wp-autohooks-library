@@ -4,8 +4,8 @@ namespace SH\AutoHook;
 
 class FileWriter
 {
-    public const START_COMMENT = "//=== Start AutoHooks Generated Section ===\n";
-    public const END_COMMENT = "//=== End AutoHooks Generated Section ===\n";
+    public const START_COMMENT = "// === Start AutoHooks Generated Section ===\n";
+    public const END_COMMENT = "// === End AutoHooks Generated Section ===\n";
 
     public static function write(string $hooks, string $path): int|false
     {
