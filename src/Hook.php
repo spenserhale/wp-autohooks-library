@@ -3,6 +3,10 @@
 namespace SH\AutoHook;
 
 use Attribute;
+use ReflectionClass;
+use ReflectionException;
+use ReflectionMethod;
+use ReflectionNamedType;
 
 /**
  * Hook Attribute
@@ -20,20 +24,33 @@ class Hook
         public string $type = 'add_filter'
     ) {}
 
-    public function setByMethod(\ReflectionClass $class, \ReflectionMethod $method): static
+    public function setByMethod(ReflectionClass $class, ReflectionMethod $method): static
     {
         $this->callback = "{$class->getName()}::{$method->getName()}";
         $this->arguments = $method->getNumberOfParameters();
-        if($method->getReturnType()?->getName() === 'void') {
+        $type = $method->getReturnType();
+        if($type instanceof ReflectionNamedType && $type->getName() === 'void') {
             $this->type = 'add_action';
         }
 
         return $this;
     }
 
-    public function setByClass(\ReflectionClass $class): static
+    public function setByClass(ReflectionClass $class): static
     {
-        $this->callback = $this->callback ? "{$class->getName()}::$this->callback" : $class->getName();
+        if($this->callback) {
+            try {
+                $type = $class->getMethod($this->callback)->getReturnType();
+                if($type instanceof ReflectionNamedType && $type->getName() === 'void') {
+                    $this->type = 'add_action';
+                }
+            } catch (ReflectionException) {
+            }
+
+            $this->callback = "{$class->getName()}::$this->callback";
+        } else {
+            $this->callback = $class->getName();
+        }
 
         return $this;
     }
