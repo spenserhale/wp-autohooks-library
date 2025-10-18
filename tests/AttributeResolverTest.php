@@ -20,7 +20,7 @@ class AttributeResolverTest extends TestCase
         self::assertStringContainsString("add_action('cli_init', 'SH\AutoHook\Tests\Examples\ExamplesClass::registerCommand', 9, 0);", $output);
         self::assertStringContainsString("add_action('rest_api_init', 'SH\AutoHook\Tests\Examples\ExamplesClass::registerController', 10, 0);", $output);
         self::assertStringContainsString("add_action('wp_init', 'SH\AutoHook\Tests\Examples\ExamplesClass::boot', 99, 0);", $output);
-        self::assertStringContainsString("add_filter('pre_update_option', 'SH\AutoHook\Tests\Examples\ExamplesClass::filterOption', 100, 1);", $output);
+        self::assertStringContainsString("add_filter('pre_update_option', 'SH\AutoHook\Tests\Examples\ExamplesClass::filterOption', 100);", $output);
         self::assertStringContainsString("add_filter('wp_insert_blog_meta', 'SH\AutoHook\Tests\Examples\ExamplesClass::logInsert', 10, 2);", $output);
         self::assertStringContainsString("add_filter('wp_insert_post_meta', 'SH\AutoHook\Tests\Examples\ExamplesClass::logInsert', 10, 2);", $output);
         self::assertStringContainsString("add_action('update_post_meta', 'SH\AutoHook\Tests\Examples\ExamplesClass::logChange', 10, 2);", $output);

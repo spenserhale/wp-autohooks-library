@@ -38,17 +38,20 @@ class AttributeResolver
      */
     public static function processClassesToList(array $classes): array
     {
-        $hooks  = [];
+        $hooks = [];
         $errors = [];
 
-        foreach ($classes as $classNamme) {
+        foreach ($classes as $className) {
             try {
-                $reflectorClass = new ReflectionClass($classNamme);
+                $reflectorClass = new ReflectionClass($className);
                 if ($reflectorClass->isAbstract() || $reflectorClass->isInterface() || $reflectorClass->isTrait()) {
                     continue;
                 }
 
                 self::processClassAttributes($hooks, $reflectorClass);
+
+                // Apply attributes that are declared on parent classes (use concrete child as the 'by class' target)
+                self::processExtendedClassAttributes($hooks, $reflectorClass);
 
                 foreach ($reflectorClass->getMethods() as $method) {
                     self::processMethodAttributes($hooks, $reflectorClass, $method);
@@ -72,8 +75,45 @@ class AttributeResolver
         }
     }
 
-    private static function processMethodAttributes(array &$hooks, ReflectionClass $class, ReflectionMethod $method): void
+    /**
+     * @template T
+     * @param  ReflectionClass|ReflectionMethod  $reflector
+     * @param  class-string<T>  $attribute
+     *
+     * @return T[]
+     */
+    private static function getAttributeInstances(ReflectionClass|ReflectionMethod $reflector, string $attribute): array
     {
+        return array_map(static fn($a) => $a->newInstance(), $reflector->getAttributes($attribute));
+    }
+
+    private static function processExtendedClassAttributes(array &$hooks, ReflectionClass $concreteClass): void
+    {
+        $class = $concreteClass;
+        while ($class = $class->getParentClass()) {
+            foreach (self::getAttributeInstances($class, Hook::class) as $hook) {
+                if ($hook->callback) {
+                    $methodName = $hook->callback;
+                    if (str_contains($methodName, '::')) {
+                        [$_, $methodName] = explode('::', $methodName, 2);
+                    }
+
+                    if ( ! $concreteClass->hasMethod($methodName)) {
+                        // Skip if the concrete class (or its parents) do not expose the method
+                        continue;
+                    }
+                }
+
+                $hooks[] = $hook->setByClass($concreteClass);
+            }
+        }
+    }
+
+    private static function processMethodAttributes(
+        array &$hooks,
+        ReflectionClass $class,
+        ReflectionMethod $method
+    ): void {
         foreach (self::getAttributeInstances($method, Hook::class) as $hook) {
             $hooks[] = $hook->setByMethod($class, $method);
         }
@@ -81,18 +121,6 @@ class AttributeResolver
         foreach (self::getAttributeInstances($method, Shortcode::class) as $shortcode) {
             $hooks[] = $shortcode->setByMethod($class, $method);
         }
-    }
-
-    /**
-     * @template T
-     * @param ReflectionClass|ReflectionMethod $reflector
-     * @param class-string<T> $attribute
-     *
-     * @return T[]
-     */
-    private static function getAttributeInstances(ReflectionClass|ReflectionMethod $reflector, string $attribute): array
-    {
-        return array_map(static fn($a) => $a->newInstance(), $reflector->getAttributes($attribute));
     }
 
     /**
