@@ -16,6 +16,11 @@ use ReflectionNamedType;
 #[Attribute(Attribute::IS_REPEATABLE | Attribute::TARGET_METHOD | Attribute::TARGET_CLASS)]
 class Hook
 {
+    /**
+     * Return types that should use add_action instead of add_filter
+     */
+    private const ACTION_RETURN_TYPES = ['void', 'never'];
+
     public function __construct(
         public string $tag,
         public int $priority = 10,
@@ -29,7 +34,7 @@ class Hook
         $this->callback = "{$class->getName()}::{$method->getName()}";
         $this->arguments = $method->getNumberOfParameters();
         $type = $method->getReturnType();
-        if($type instanceof ReflectionNamedType && $type->getName() === 'void') {
+        if($this->shouldUseAction($type)) {
             $this->type = 'add_action';
         }
 
@@ -41,7 +46,7 @@ class Hook
         if($this->callback) {
             try {
                 $type = $class->getMethod($this->callback)->getReturnType();
-                if($type instanceof ReflectionNamedType && $type->getName() === 'void') {
+                if($this->shouldUseAction($type)) {
                     $this->type = 'add_action';
                 }
             } catch (ReflectionException) {
@@ -53,6 +58,15 @@ class Hook
         }
 
         return $this;
+    }
+
+    /**
+     * Determine if the return type should use add_action instead of add_filter
+     */
+    private function shouldUseAction(mixed $type): bool
+    {
+        return $type instanceof ReflectionNamedType 
+            && in_array($type->getName(), self::ACTION_RETURN_TYPES, true);
     }
 
     public function __toString(): string

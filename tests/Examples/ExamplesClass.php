@@ -29,6 +29,12 @@ class ExamplesClass
     #[Hook('update_post_meta'), Hook('update_option_meta')]
     public static function logChange(mixed $old_value, mixed $value): void {}
 
+    #[Hook('wp_ajax_pbhs_users_add_client')]
+    public static function handleUsersAddClientAjax(): never
+    {
+        wp_die();
+    }
+
     #[Shortcode('example_shortcode')]
     public static function shortcode() {}
 }

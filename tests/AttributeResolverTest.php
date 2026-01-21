@@ -25,6 +25,7 @@ class AttributeResolverTest extends TestCase
         self::assertStringContainsString("add_filter('wp_insert_post_meta', 'SH\AutoHook\Tests\Examples\ExamplesClass::logInsert', 10, 2);", $output);
         self::assertStringContainsString("add_action('update_post_meta', 'SH\AutoHook\Tests\Examples\ExamplesClass::logChange', 10, 2);", $output);
         self::assertStringContainsString("add_action('update_option_meta', 'SH\AutoHook\Tests\Examples\ExamplesClass::logChange', 10, 2);", $output);
+        self::assertStringContainsString("add_action('wp_ajax_pbhs_users_add_client', 'SH\AutoHook\Tests\Examples\ExamplesClass::handleUsersAddClientAjax', 10, 0);", $output);
         self::assertStringContainsString("add_shortcode('other_shortcode', 'SH\AutoHook\Tests\Examples\ExamplesClass::otherShortcode');", $output);
         self::assertStringContainsString("add_shortcode('example_shortcode', 'SH\AutoHook\Tests\Examples\ExamplesClass::shortcode');", $output);
     }
@@ -35,7 +36,7 @@ class AttributeResolverTest extends TestCase
 
         self::assertEmpty($errors);
 
-        self::assertCount(9, array_filter($hooks, static fn($hook) => $hook instanceof Hook));
+        self::assertCount(10, array_filter($hooks, static fn($hook) => $hook instanceof Hook));
         self::assertCount(2, array_filter($hooks, static fn($hook) => $hook instanceof Shortcode));
     }
 
